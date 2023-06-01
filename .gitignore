@@ -1,0 +1,3 @@
+# local build files
+src/**/bin
+src/**/obj
