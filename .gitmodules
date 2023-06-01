@@ -1,0 +1,3 @@
+[submodule "vendor/checker-repo"]
+	path = vendor/checker-repo
+	url = https://gitlab-hackathon.relaxdays.cloud/aufgaben/summer-2023-verkaufsprognose.git
