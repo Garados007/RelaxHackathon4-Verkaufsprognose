@@ -8,5 +8,5 @@ public class Order
     public int ProductId { get; set; }
 
     [JsonPropertyName("order_amount")]
-    public uint OrderAmount { get; set; }
+    public int OrderAmount { get; set; }
 }
