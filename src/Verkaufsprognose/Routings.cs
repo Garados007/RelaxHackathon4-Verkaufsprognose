@@ -31,4 +31,20 @@ public sealed class Routings : Service
             new Order { OrderAmount = 420, ProductId = 1337 },
         };
     }
+
+    [Path("/products")]
+    [Method(HttpProtocolMethod.Get)]
+    [return: JsonDataConverter]
+    public Dictionary<int, Product> GetProducts()
+    {
+        return Program.Data.Products;
+    }
+
+    [Path("/storage")]
+    [Method(HttpProtocolMethod.Get)]
+    [return: JsonDataConverter]
+    public Dictionary<int, int> GetStorage()
+    {
+        return Program.Data.Storage;
+    }
 }

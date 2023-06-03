@@ -7,6 +7,8 @@ namespace Verkaufsprognose;
 
 public class Program
 {
+    public static DataContainer Data { get; private set; } = new(new(), new());
+
     public static async Task Main(string[] args)
     {
         // setup serilog
@@ -17,6 +19,10 @@ public class Program
             .CreateLogger();
         WebServerLog.LogPreAdded += WebServerLog_LogPreAdded;
 
+        // load data
+        if (!await SetupData(args))
+            return;
+
         // setup server
         using var server = new Server(new WebServerSettings(port: 3000, connectionTimeout: 5000));
         server.InitialDefault(); // initialize default services
@@ -26,6 +32,47 @@ public class Program
 
         // run server
         await server.RunAsync();
+    }
+
+    // load data
+
+    private static async Task<bool> SetupData(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Log.Fatal("A minimum of one argument expected");
+            return false;
+        }
+        if (!Directory.Exists(args[0]))
+        {
+            Log.Fatal("Directory {dir} does not exists as data directory", args[0]);
+            return false;
+        }
+
+        // load products
+        var file = Path.Combine(args[0], "products.csv");
+        if (!File.Exists(file))
+        {
+            Log.Fatal("File {file} not found", file);
+            return false;
+        }
+        var prods = new Dictionary<int, Product>();
+        await foreach (var product in Product.GetProductsAsync(file))
+            prods.Add(product.Id, product);
+
+        // load storage
+        file = Path.Combine(args[0], "storage_02.csv");
+        if (!File.Exists(file))
+        {
+            Log.Fatal("File {file} not found", file);
+            return false;
+        }
+        var storage = new Dictionary<int, int>();
+        await foreach (var entry in Storage.GetStorageAsync(file))
+            storage.Add(entry.ProductId, entry.Count);
+
+        Data = new(prods, storage);
+        return true;
     }
 
     // just some code to move logs from internal web server to serilog
