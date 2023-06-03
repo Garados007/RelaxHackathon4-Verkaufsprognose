@@ -11,6 +11,8 @@ public class Statistics
         this.now = now;
     }
 
+    public int Id => info.Product.Id;
+
     public float ExpectedSellsPerDay => info.ExpectedSellsPerDay(now);
 
     public float RemainingDays => info.RemainingDays(now);

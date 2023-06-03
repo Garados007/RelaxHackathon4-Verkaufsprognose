@@ -2,16 +2,23 @@ namespace Verkaufsprognose;
 
 public class Info
 {
-
     public Product Product { get; }
 
+    public float SellPrice { get; }
+
     public float BestDuration { get; }
+
+    public float BestPredictionDuration { get; }
 
     public int Storage { get; set; }
 
     public int Sold { get; set; }
 
-    public List<(DateTime arrival, int amount)> Orders { get; } = new();
+    public List<PlanedOrder> PredictedOrders { get; } = new();
+
+    public List<PlanedOrder> Orders { get; } = new();
+
+    public Dictionary<DateTime, int> PredictableSales { get; } = new();
 
     public float ExpectedSellsPerDay(DateTime now)
     {
@@ -27,21 +34,24 @@ public class Info
 
     public void FinializeOrders(DateTime now)
     {
-        var deleteList = new List<(DateTime arrival, int amount)>();
-        foreach (var (arrival, amount) in Orders)
+        var deleteList = new List<PlanedOrder>();
+        foreach (var entry in Orders)
         {
-            if (arrival > now)
+            if (entry.Date > now)
                 continue;
-            deleteList.Add((arrival, amount));
-            Storage += amount;
+            deleteList.Add(entry);
+            Storage += entry.Amount;
         }
         foreach (var entry in deleteList)
             Orders.Remove(entry);
     }
 
-    public Info(Product product)
+    public Info(Product product, float sellPrice)
     {
         Product = product;
-        BestDuration = (product.Price - 0.5f * product.StorageCost) / product.StorageCost;
+        SellPrice = sellPrice;
+        // BestDuration = (sellPrice - product.Price - 0.5f * product.StorageCost) / product.StorageCost;
+        BestDuration = product.ShippingDuration * 0.5f;
+        BestPredictionDuration = product.ShippingDuration * 0.6f;
     }
 }

@@ -4,7 +4,7 @@ namespace Verkaufsprognose.Estimation;
 
 public sealed class StockEstimation
 {
-    public StockEstimation(float expectedSellsPerDay, int startStock, DateTime now, List<(DateTime arrival, int amount)> orders)
+    public StockEstimation(float expectedSellsPerDay, int startStock, DateTime now, List<PlanedOrder> orders)
     {
         ExpectedSellsPerDay = expectedSellsPerDay;
         StartStock = startStock;
@@ -18,7 +18,7 @@ public sealed class StockEstimation
 
     public DateTime Now { get; }
 
-    public List<(DateTime arrival, int amount)> Orders { get; }
+    public List<PlanedOrder> Orders { get; }
 
     public ReadOnlyMemory<float> PrognosedStock { get; private set; }
 
@@ -62,10 +62,10 @@ public sealed class StockEstimation
         // estimate the maximum prognosed stock size.
         var stockSum = StartStock;
         if (Orders.Count > 0)
-            stockSum += Orders.Sum(x => x.amount);
+            stockSum += Orders.Sum(x => x.Amount);
         var days = (int)Math.Ceiling(stockSum / ExpectedSellsPerDay);
         if (Orders.Count > 0)
-            days += (int)Math.Ceiling((Orders.Max(x => x.arrival) - Now).TotalDays);
+            days += (int)Math.Ceiling((Orders.Max(x => x.Date) - Now).TotalDays);
         Memory<float> prognosedStock = new float[days];
         PrognosedStock = prognosedStock;
         return prognosedStock;

@@ -7,7 +7,7 @@ namespace Verkaufsprognose;
 
 public class Program
 {
-    public static DataContainer Data { get; private set; } = new(new(), new());
+    public static DataContainer Data { get; private set; } = new(new(), new(), new());
 
     public static async Task Main(string[] args)
     {
@@ -24,7 +24,7 @@ public class Program
             return;
 
         // setup server
-        using var server = new Server(new WebServerSettings(port: 3000, connectionTimeout: 5000));
+        using var server = new Server(new WebServerSettings(port: 3000, connectionTimeout: 600000));
         server.InitialDefault(); // initialize default services
         var builder = Service.Build<Routings>();
         if (builder is not null)
@@ -71,7 +71,18 @@ public class Program
         await foreach (var entry in Storage.GetStorageAsync(file))
             storage.Add(entry.ProductId, entry.Count);
 
-        Data = new(prods, storage);
+        // load predictable sales
+        file = Path.Combine(args[0], "sales_task2.csv");
+        if (!File.Exists(file))
+        {
+            Log.Fatal("File {file} not found", file);
+            return false;
+        }
+        var sales = new List<Sales>();
+        await foreach (var entry in Sales.GetSalesAsync(file))
+            sales.Add(entry);
+
+        Data = new(prods, storage, sales);
         return true;
     }
 
