@@ -48,3 +48,16 @@ jobs:
           name: test-reports
           path: |
             src/Verkaufsprognose.Test/TestResults
+
+  DockerTest:
+    name: Run Docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Create docker container
+        run: docker build -t regale .
+      # - name: Run docker container
+      #   run: docker run regale
