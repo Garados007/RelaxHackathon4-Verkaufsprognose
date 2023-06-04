@@ -22,7 +22,7 @@ public class Sales
     public int ProductId { get; set; }
 
     [JsonPropertyName("product_count"), Name("product_count")]
-    public uint ProductCount { get; set; }
+    public int ProductCount { get; set; }
 
     [JsonPropertyName("customer_count"), Name("customer_count")]
     public uint CustomerCount { get; set; }

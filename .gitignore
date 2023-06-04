@@ -1,3 +1,6 @@
 # local build files
 src/**/bin
 src/**/obj
+# training files
+src/Tools/Trainer/solution.json
+src/Tools/Trainer/sol/*
