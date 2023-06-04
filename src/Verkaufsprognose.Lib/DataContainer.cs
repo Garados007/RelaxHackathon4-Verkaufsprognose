@@ -34,12 +34,20 @@ public sealed class DataContainer
             estimation.GetOrders(info);
         }
         if (predictableSales.Count > 0)
+        {
             LatestPrediction = predictableSales.Max(x => x.Date);
+            Armageddon = new DateTime(LatestPrediction.Year, LatestPrediction.Month + 2, 1).AddDays(-1);
+        }
     }
 
     public Dictionary<int, Info> Inventory { get; }
 
     public DateTime LatestPrediction { get; }
+
+    /// <summary>
+    /// No sales after this point. The storage has to be empty.
+    /// </summary>
+    public DateTime Armageddon { get; }
 
     public void AddSells(IEnumerable<Sales> sales)
     {
@@ -88,10 +96,13 @@ public sealed class DataContainer
         }
     }
 
-    private static Order? GetUnknownOrder(DateTime now, Info item)
+    private Order? GetUnknownOrder(DateTime now, Info item)
     {
         // check if this item was sold at all
         if (item.Sold == 0)
+            return null;
+        // check if there is not enough time
+        if (now.AddDays(item.Product.ShippingDuration) > Armageddon)
             return null;
         // get the remaining days this item will be on stock
         var remainingDays = item.RemainingDays(now);
@@ -112,7 +123,8 @@ public sealed class DataContainer
         if ((outOfStock - now).TotalDays > item.Product.ShippingDuration + 1)
             return null;;
         // calculate the maximum stock that is needed for the next optimal interval
-        var expected = item.BestPredictionDuration * item.ExpectedSellsPerDay(now);
+        var duration = Math.Min(item.BestPredictionDuration, (Armageddon - now).TotalDays);
+        var expected = duration * item.ExpectedSellsPerDay(now);
         // create order
         var order = new Order
         {
