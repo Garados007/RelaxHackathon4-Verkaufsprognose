@@ -2,7 +2,10 @@ namespace Verkaufsprognose;
 
 public sealed class DataContainer
 {
-    public DataContainer(Dictionary<int, Product> products, Dictionary<int, int> storage, List<Sales> predictableSales)
+    public DataContainer(Dictionary<int, Product> products, Dictionary<int, int> storage,
+        List<Sales> predictableSales, Dictionary<int, (float, float)>? factors = null,
+        float knownFactor = 0.5f, float estimateFactor = 0.6f
+    )
     {
         Inventory = new();
         var estimation = new Estimation.PredictableRestockEstimation();
@@ -11,7 +14,14 @@ public sealed class DataContainer
             var lowCost = predictableSales.Where(x => x.ProductId == product.Id).Min(x => x.SalesPrice);
             var highCost = predictableSales.Where(x => x.ProductId == product.Id).Max(x => x.SalesPrice);
 
-            var info = new Info(product, (lowCost + highCost) * 0.5f);
+            Info info;
+            if (factors is null)
+                info = new Info(product, (lowCost + highCost) * 0.5f, knownFactor, estimateFactor);
+            else
+            {
+                (knownFactor, estimateFactor) = factors[product.Id];
+                info = new Info(product, (lowCost + highCost) * 0.5f, knownFactor, estimateFactor);
+            }
 
             Inventory.Add(info.Product.Id, info);
             if (storage.TryGetValue(info.Product.Id, out int amount))

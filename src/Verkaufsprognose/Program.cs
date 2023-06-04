@@ -1,4 +1,5 @@
-﻿using MaxLib.WebServer;
+﻿using System.Text.Json;
+using MaxLib.WebServer;
 using MaxLib.WebServer.Builder;
 using Serilog;
 using Serilog.Events;
@@ -8,6 +9,8 @@ namespace Verkaufsprognose;
 public class Program
 {
     public static DataContainer Data { get; private set; } = new(new(), new(), new());
+
+    public static Dictionary<int, (float, float)> TrainingConstants { get; } = new();
 
     public static async Task Main(string[] args)
     {
@@ -50,6 +53,7 @@ public class Program
         }
 
         // load products
+        Log.Debug("Load products");
         var file = Path.Combine(args[0], "products.csv");
         if (!File.Exists(file))
         {
@@ -61,6 +65,7 @@ public class Program
             prods.Add(product.Id, product);
 
         // load storage
+        Log.Debug("load storage");
         file = Path.Combine(args[0], "storage_02.csv");
         if (!File.Exists(file))
         {
@@ -72,6 +77,7 @@ public class Program
             storage.Add(entry.ProductId, entry.Count);
 
         // load predictable sales
+        Log.Debug("load predictable sales");
         file = Path.Combine(args[0], "sales_task2.csv");
         if (!File.Exists(file))
         {
@@ -82,7 +88,34 @@ public class Program
         await foreach (var entry in Sales.GetSalesAsync(file))
             sales.Add(entry);
 
-        Data = new(prods, storage, sales);
+        if (args.Length == 1)
+        {
+            Data = new(prods, storage, sales);
+            return true;
+        }
+
+        // load training data
+        Log.Debug("load training data");
+        if (!File.Exists(args[1]))
+        {
+            Log.Fatal("Training file {file} not found", args[1]);
+            return false;
+        }
+
+        using var stream = new FileStream(args[1], FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read);
+        var doc = await JsonDocument.ParseAsync(stream);
+        foreach (var node in doc.RootElement.EnumerateObject())
+        {
+            var key = int.Parse(node.Name);
+            var a = node.Value.GetProperty("a").GetSingle();
+            var b = node.Value.GetProperty("b").GetSingle();
+            TrainingConstants.Add(key, (a, b));
+        }
+
+        Log.Debug("prepare data");
+        Data = new(prods, storage, sales, TrainingConstants);
+
+        Log.Debug("data loading finished");
         return true;
     }
 

@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{40520C7D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesFiller", "Tools\SalesFiller\SalesFiller.csproj", "{97CC6962-3D61-41F4-809F-F587C7D2BBA0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trainer", "Tools\Trainer\Trainer.csproj", "{C10ED168-04EF-4A6A-B906-549496B08E7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,8 +40,13 @@ Global
 		{97CC6962-3D61-41F4-809F-F587C7D2BBA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97CC6962-3D61-41F4-809F-F587C7D2BBA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97CC6962-3D61-41F4-809F-F587C7D2BBA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C10ED168-04EF-4A6A-B906-549496B08E7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C10ED168-04EF-4A6A-B906-549496B08E7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C10ED168-04EF-4A6A-B906-549496B08E7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C10ED168-04EF-4A6A-B906-549496B08E7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{97CC6962-3D61-41F4-809F-F587C7D2BBA0} = {40520C7D-6C0A-47CB-9298-3965149BC77A}
+		{C10ED168-04EF-4A6A-B906-549496B08E7F} = {40520C7D-6C0A-47CB-9298-3965149BC77A}
 	EndGlobalSection
 EndGlobal

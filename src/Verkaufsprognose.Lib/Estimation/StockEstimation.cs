@@ -32,7 +32,10 @@ public sealed class StockEstimation
         // add orders
         foreach (var (arrival, amount) in Orders)
         {
-            prognosed[(int)(arrival - Now).TotalDays] += amount;
+            var index = (int)(arrival - Now).TotalDays;
+            if (index < 0 || index >= prognosed.Length)
+                continue;
+            prognosed[index] += amount;
         }
 
         // spread stock among the days

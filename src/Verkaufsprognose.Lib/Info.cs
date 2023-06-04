@@ -46,12 +46,13 @@ public class Info
             Orders.Remove(entry);
     }
 
-    public Info(Product product, float sellPrice)
+    public Info(Product product, float sellPrice, float knownFactor = 0.5f, float estimateFactor = 0.6f)
     {
+        // Console.WriteLine($"knownFactor={knownFactor}, estimateFactor={estimateFactor}");
         Product = product;
         SellPrice = sellPrice;
         // BestDuration = (sellPrice - product.Price - 0.5f * product.StorageCost) / product.StorageCost;
-        BestDuration = product.ShippingDuration * 0.5f;
-        BestPredictionDuration = product.ShippingDuration * 0.6f;
+        BestDuration = product.ShippingDuration * knownFactor;
+        BestPredictionDuration = product.ShippingDuration * estimateFactor;
     }
 }
